@@ -1,2 +1,2 @@
-# dsl
-Data Structures Library for Python
+# cdsl
+Common Data Structures Library for Python
