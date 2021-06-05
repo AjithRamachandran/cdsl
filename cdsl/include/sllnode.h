@@ -262,7 +262,7 @@ sll_node_at(SllObject *self, PyObject *args) {
     return current_node;
 }
 
-static void
+static PyObject *
 sll_extend(SllObject *self, SllObject *arg) {
     SllNodeObject *current_node = arg->head, *node = NULL;
 
@@ -364,7 +364,7 @@ static PyObject *
 sll_delete_node(SllObject *self, SllNodeObject *node) {
     SllNodeObject *prev = NULL;
     PyObject *value;
-    int pos = self->length - 1, i;
+    int pos = self->length - 1;
 
     if (self->head == Py_None) {
         PyErr_SetString(PyExc_ValueError, "Empty List.");
@@ -381,7 +381,7 @@ sll_delete_node(SllObject *self, SllNodeObject *node) {
     return value;
 }
 
-static void
+static PyObject *
 sll_insert(SllObject *self, PyObject *args) {
     SllNodeObject *new_node = NULL, *current_node = NULL;
     PyObject *value;
@@ -433,7 +433,7 @@ sll_insert(SllObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static void
+static PyObject *
 sll_insert_node(SllObject *self, PyObject *args) {
     SllNodeObject *current_node = NULL, *node = NULL;
     PyObject *arg = NULL;
