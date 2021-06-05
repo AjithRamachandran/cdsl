@@ -12,16 +12,15 @@ static PyTypeObject SllNodeType;
 
 typedef struct {
     PyObject_HEAD
-    PyObject *value;
+        PyObject *value;
     struct SllNodeObject *next;
 } SllNodeObject;
 
 static void
 sllnode_delete(SllNodeObject *node, SllNodeObject *prev) {
-    
-    if(prev != Py_None)
-        prev->next=node->next;
-        
+    if (prev != Py_None)
+        prev->next = node->next;
+
     Py_XINCREF(Py_None);
     node->next = Py_None;
 
@@ -42,7 +41,7 @@ sllnode_create(SllNodeObject *next, PyObject *value) {
 
 static PyObject *
 SllNodeObject_Repr(SllNodeObject *self) {
-    PyObject *ret=NULL;
+    PyObject *ret = NULL;
 
     if (Py_ReprEnter((PyObject *)self) > 0)
         return PyUnicode_FromString("sllnode(<...>)");
@@ -55,7 +54,7 @@ SllNodeObject_Repr(SllNodeObject *self) {
 
 static PyObject *
 SllNodeObject_Str(SllNodeObject *self) {
-    PyObject *ret=NULL;
+    PyObject *ret = NULL;
 
     if (Py_ReprEnter((PyObject *)self) > 0)
         return PyUnicode_FromString("sllnode(<...>)");
@@ -64,6 +63,17 @@ SllNodeObject_Str(SllNodeObject *self) {
 
     Py_ReprLeave((PyObject *)self);
     return ret;
+}
+
+SllNodeObject_Traverse(SllNodeObject *self) {
+    Py_VISIT(self->value);
+    return 0;
+}
+
+static int
+SllNodeObject_Clear(SllNodeObject *self) {
+    Py_TYPE(self)->tp_free((PyObject *)self);
+    return 0;
 }
 
 static void
@@ -115,7 +125,7 @@ static PyMemberDef SllNodeObject_members[] = {
 
 static PyTypeObject SllNodeType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "cdsl.sllnode",
+    .tp_name = "cdsl.sllnode",
     .tp_doc = "SllNode object",
     .tp_basicsize = sizeof(SllNodeObject),
     .tp_new = SllNodeObject_new,
@@ -123,6 +133,8 @@ static PyTypeObject SllNodeType = {
     .tp_dealloc = (destructor)sllNodeObject_dealloc,
     .tp_repr = (reprfunc)SllNodeObject_Repr,
     .tp_str = (reprfunc)SllNodeObject_Str,
+    .tp_traverse = (traverseproc)SllNodeObject_Traverse,
+    .tp_clear = (inquiry)SllNodeObject_Clear,
     .tp_members = SllNodeObject_members,
 };
 
@@ -132,7 +144,7 @@ static PyTypeObject SllNodeType = {
 
 typedef struct {
     PyObject_HEAD
-    SllNodeObject *head;
+        SllNodeObject *head;
     SllNodeObject *tail;
     int length;
 } SllObject;
@@ -140,17 +152,16 @@ typedef struct {
 static PyObject *
 SllObject_Repr(SllObject *self) {
     SllNodeObject *current_node = self->head;
-    PyObject *ret=NULL;
-    
+    PyObject *ret = NULL;
+
     ret = PyUnicode_FromString("sll([");
 
     if (Py_ReprEnter((PyObject *)self) > 0)
         return PyUnicode_FromString("sll(<...>)");
 
-
     if (current_node != Py_None) {
         while (current_node != Py_None) {
-            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Repr(current_node->value) ));
+            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Repr(current_node->value)));
             if (current_node != self->tail)
                 ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
             current_node = current_node->next;
@@ -166,7 +177,7 @@ SllObject_Repr(SllObject *self) {
 static PyObject *
 SllObject_Str(SllObject *self) {
     SllNodeObject *current_node = self->head;
-    PyObject *ret=NULL;
+    PyObject *ret = NULL;
 
     ret = PyUnicode_FromString("sll([");
 
@@ -175,7 +186,7 @@ SllObject_Str(SllObject *self) {
 
     if (current_node != Py_None) {
         while (current_node != Py_None) {
-            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Str(current_node->value) ));
+            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Str(current_node->value)));
             if (current_node != self->tail)
                 ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
             current_node = current_node->next;
@@ -188,13 +199,45 @@ SllObject_Str(SllObject *self) {
     return ret;
 }
 
+static int
+SllObject_Traverse(SllObject *self) {
+    SllNodeObject *node = self->head;
+
+    while (node != Py_None) {
+        SLListNodeObject* next_node = node->next;
+        Py_VISIT(node);
+        node = next_node;
+    }
+
+    Py_XDECREF(node);
+    return 0;
+
+}
+
+static int
+SllObject_Clear(SllObject *self) {
+    SllNodeObject *node = self->head;
+
+    self->head = NULL;
+    self->tail = NULL;
+
+    while (node != Py_None) {
+        SLListNodeObject* next_node = node->next;
+        node->next = Py_None;
+        Py_DECREF(node);
+        node = next_node;
+    }
+
+    return 0;
+}
+
 static SllNodeObject *
 get_prev_node(SllObject *self, SllNodeObject *node) {
     SllNodeObject *current_node = self->head;
 
-    if(current_node != node) {
-        while(current_node->next != Py_None) {
-            if(current_node->next == node) {
+    if (current_node != node) {
+        while (current_node->next != Py_None) {
+            if (current_node->next == node) {
                 Py_XINCREF(current_node);
                 return current_node;
             }
@@ -208,9 +251,9 @@ get_prev_node(SllObject *self, SllNodeObject *node) {
 
 static PyObject *
 sll_delete(SllObject *self, PyObject *args) {
-    SllNodeObject *del_node = NULL, *prev=NULL;
+    SllNodeObject *del_node = NULL, *prev = NULL;
     PyObject *value;
-    int pos = self->length-1, i;
+    int pos = self->length - 1, i;
 
     if (!PyArg_ParseTuple(args, "|i", &pos))
         return NULL;
@@ -230,15 +273,15 @@ sll_delete(SllObject *self, PyObject *args) {
         prev = get_prev_node(self, self->head);
         del_node = self->head->next;
         sllnode_delete(self->head, prev);
-        self->head=del_node;
-    } else if (pos == self->length-1 || pos == -1) {
+        self->head = del_node;
+    } else if (pos == self->length - 1 || pos == -1) {
         value = self->tail->value;
         prev = get_prev_node(self, self->tail);
         sllnode_delete(self->tail, prev);
-        self->tail=prev;
+        self->tail = prev;
     } else {
         del_node = self->head;
-        for(i=0; i < pos; i++) {
+        for (i = 0; i < pos; i++) {
             del_node = del_node->next;
         }
         value = del_node->value;
@@ -249,6 +292,27 @@ sll_delete(SllObject *self, PyObject *args) {
 
     Py_XDECREF(prev);
     Py_XDECREF(del_node);
+    Py_XINCREF(value);
+    return value;
+}
+
+static PyObject *
+sll_delete_node(SllObject *self, SllNodeObject *node) {
+    SllNodeObject *prev = NULL;
+    PyObject *value;
+    int pos = self->length - 1, i;
+
+    if (self->head == Py_None) {
+        PyErr_SetString(PyExc_ValueError, "Empty List.");
+        return NULL;
+    }
+
+    value = node->value;
+    prev = get_prev_node(self, node);
+    sllnode_delete(node, prev);
+    self->length--;
+
+    Py_XDECREF(prev);
     Py_XINCREF(value);
     return value;
 }
@@ -285,13 +349,13 @@ sll_insert(SllObject *self, PyObject *args) {
     if (pos == 0) {
         new_node = sllnode_create(self->head, value);
         self->head = new_node;
-    } else if (pos == self->length-1 || pos == -1) {
+    } else if (pos == self->length - 1 || pos == -1) {
         new_node = sllnode_create(Py_None, value);
         self->tail->next = new_node;
         self->tail = new_node;
     } else {
         current_node = self->head;
-        for(i=1; i < pos; i++) {
+        for (i = 1; i < pos; i++) {
             current_node = current_node->next;
         }
         new_node = sllnode_create(current_node->next, value);
@@ -307,8 +371,8 @@ sll_insert(SllObject *self, PyObject *args) {
 
 static void
 sll_insert_node(SllObject *self, PyObject *args) {
-    SllNodeObject *current_node = NULL, *node=NULL;
-    PyObject *arg=NULL;
+    SllNodeObject *current_node = NULL, *node = NULL;
+    PyObject *arg = NULL;
     int pos = -1, i;
 
     if (!PyArg_ParseTuple(args, "O|i", &arg, &pos))
@@ -329,7 +393,7 @@ sll_insert_node(SllObject *self, PyObject *args) {
     }
 
     if (self->head == Py_None) {
-        node->next=Py_None;
+        node->next = Py_None;
         self->head = node;
         self->tail = node;
         self->length++;
@@ -337,18 +401,18 @@ sll_insert_node(SllObject *self, PyObject *args) {
     }
 
     if (pos == 0) {
-        node->next=self->head->next;
+        node->next = self->head->next;
         self->head = node;
-    } else if (pos == self->length-1 || pos == -1) {
-        node->next=Py_None;
+    } else if (pos == self->length - 1 || pos == -1) {
+        node->next = Py_None;
         self->tail->next = node;
         self->tail = node;
     } else {
         current_node = self->head;
-        for(i=1; i < pos; i++) {
+        for (i = 1; i < pos; i++) {
             current_node = current_node->next;
         }
-        node->next=current_node->next;
+        node->next = current_node->next;
         current_node->next = node;
     }
     self->length++;
@@ -393,7 +457,8 @@ sllObject_init(SllObject *self, PyObject *args, PyObject *kwds) {
 static PyMethodDef SllObjectMethods[] = {
     {"insert", (PyCFunction)sll_insert, METH_VARARGS, "Insert element to the list"},
     {"insert_node", (PyCFunction)sll_insert_node, METH_VARARGS, "Insert node to the list"},
-    { "delete", (PyCFunction)sll_delete, METH_VARARGS, "Delete element to the list"},
+    {"delete", (PyCFunction)sll_delete, METH_VARARGS, "Delete element to the list"},
+    {"delete_node", (PyCFunction)sll_delete_node, METH_O, "Delete node from the list"},
     {NULL},
 };
 
@@ -406,7 +471,7 @@ static PyMemberDef SllObject_members[] = {
 
 static PyTypeObject SllType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "cdsl.sll",
+    .tp_name = "cdsl.sll",
     .tp_doc = "Sll object",
     .tp_basicsize = sizeof(SllObject),
     .tp_new = SllObject_new,
@@ -414,6 +479,8 @@ static PyTypeObject SllType = {
     .tp_dealloc = (destructor)sllObject_dealloc,
     .tp_repr = (reprfunc)SllObject_Repr,
     .tp_str = (reprfunc)SllObject_Str,
+    .tp_traverse = (traverseproc)SllObject_Traverse,
+    .tp_clear = (inquiry)SllObject_Clear,
     .tp_methods = SllObjectMethods,
     .tp_members = SllObject_members,
 };
