@@ -26,6 +26,7 @@ class TestSll(unittest.TestCase):
         new_sll.extend(new_sll)
 
         print(new_sll)
+        print(new_sll.node_at(5))
 
         self.assertEqual(0, 0)
 

@@ -230,6 +230,22 @@ SllObject_Clear(SllObject *self) {
     return 0;
 }
 
+static SllNodeObject *
+sll_node_at(SllObject *self, PyObject *args) {
+    SllNodeObject *current_node = self->head;
+    int index;
+    
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return NULL;
+
+    while(index--) {
+        current_node = current_node->next;
+    }
+
+    Py_XDECREF(current_node);
+    return current_node;
+}
+
 static void
 sll_extend(SllObject *self, SllObject *arg) {
     SllNodeObject *current_node = arg->head, *node = NULL;
@@ -492,6 +508,7 @@ static PyMethodDef SllObjectMethods[] = {
     {"delete", (PyCFunction)sll_delete, METH_VARARGS, "Delete element to the list"},
     {"delete_node", (PyCFunction)sll_delete_node, METH_O, "Delete node from the list"},
     {"extend", (PyCFunction)sll_extend, METH_O, "extend sll with another sll"},
+    {"node_at", (PyCFunction)sll_node_at, METH_VARARGS, "get sll at given index"},
     {NULL},
 };
 
