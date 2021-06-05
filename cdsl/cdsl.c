@@ -1,6 +1,7 @@
 #include <Python.h>
 
-#include "include/sllnode.h"
+#include "include/sll.h"
+#include "include/stack.h"
 
 static PyMethodDef cdsl_methods[] = {
     { NULL }, /* sentinel */
@@ -19,16 +20,28 @@ PyInit_cdsl(void)
 {
     PyObject* cdsl;
 
+    if(!slnode_init_type())
+        return NULL;
+
     if(!sll_init_type())
         return NULL;
+
+    // if(!stack_init_type())
+    //     return NULL;
 
     cdsl = PyModule_Create(&cdsl_moduledef);
 
     if (cdsl==NULL)
         return NULL;
 
+    if(!slnode_reg_type(cdsl))
+        return NULL;
+
     if(!sll_reg_type(cdsl))
         return NULL;
+
+    // if(!stack_reg_type(cdsl))
+    //     return NULL;
 
     return cdsl;
 }

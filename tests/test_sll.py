@@ -1,6 +1,6 @@
 import unittest
 
-from cdsl import sll, sllnode
+from cdsl import sll, slnode
 
 class TestSll(unittest.TestCase):
     def test_sll(self):
@@ -42,7 +42,7 @@ class TestSll(unittest.TestCase):
 #         new_sll.insert(5, 0)
 #         new_sll.insert(6, 0)
 #         print(new_sll, new_sll.length, new_sll.head, new_sll.tail)
-#         new_sllnode = sllnode(10)
+#         new_sllnode = slnode(10)
 #         print(new_sllnode, new_sllnode.value, new_sllnode.next )
 #         new_sll.insert_node(new_sllnode, 0)
 #         print(new_sllnode, new_sllnode.value, new_sllnode.next )
