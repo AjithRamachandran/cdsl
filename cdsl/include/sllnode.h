@@ -231,6 +231,22 @@ SllObject_Clear(SllObject *self) {
 }
 
 static SllNodeObject *
+sll_search(SllObject *self, PyObject *value) {
+    SllNodeObject *current_node = self->head;
+
+    while(current_node != Py_None) {
+        if(current_node->value == value){
+            Py_DECREF(current_node);
+            return current_node;
+        }
+        current_node = current_node->next;
+    }
+
+    Py_XDECREF(current_node);
+    Py_RETURN_NONE;
+}
+
+static SllNodeObject *
 sll_node_at(SllObject *self, PyObject *args) {
     SllNodeObject *current_node = self->head;
     int index;
@@ -509,6 +525,7 @@ static PyMethodDef SllObjectMethods[] = {
     {"delete_node", (PyCFunction)sll_delete_node, METH_O, "Delete node from the list"},
     {"extend", (PyCFunction)sll_extend, METH_O, "extend sll with another sll"},
     {"node_at", (PyCFunction)sll_node_at, METH_VARARGS, "get sll at given index"},
+    {"search", (PyCFunction)sll_search, METH_O, "return first node with given value"},
     {NULL},
 };
 
