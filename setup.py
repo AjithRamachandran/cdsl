@@ -1,6 +1,8 @@
-VERSION='0.1.dev'
+VERSION='0.1.dev0'
 
-from setuptools import setup
+from setuptools import setup, Extension
+
+sources=[ 'cdsl/cdsl.c']
 
 with open("README.md", "r") as doc:
     long_description = doc.read()
@@ -12,18 +14,20 @@ with open("requirements.txt", "r") as mFile:
 
 require = [i for i in requirements if not i == ""]
 
+cdsl = Extension('cdsl', sources=sources, include_dirs=['cdsl/include'])
+
 setup(
-    name="dsl",
+    name="cdsl",
     version=VERSION,
     author="Ajith Ramachandran",
     author_email="ajithar204@gmail.com",
-    description="Data Structures for Python",
+    description="Common Data Structures for Python",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url="https://github.com/AjithRamachandran/dsl",
+    url="https://github.com/AjithRamachandran/cdsl",
     keywords='data structures',
     license='MIT',
-    packages=['dsl'],
+    packages=['cdsl'],
     install_requires=require,
     tests_require=['unittest'],
     classifiers=[
@@ -32,5 +36,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: Implementation :: CPython",
     ],
+    ext_modules=[cdsl],
     python_requires='>=3.7',
 )

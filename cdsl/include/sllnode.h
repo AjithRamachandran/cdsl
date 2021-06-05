@@ -262,9 +262,11 @@ sll_insert(SllObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "O|i", &value, &pos))
         return NULL;
 
-    if (pos < 0 || pos > self->length) {
-        PyErr_SetString(PyExc_ValueError, "index out of range.");
-        return NULL;
+    if (pos != 0) {
+        if ((pos < 0 || pos >= self->length)) {
+            PyErr_SetString(PyExc_ValueError, "index out of range.");
+            return NULL;
+        }
     }
 
     if ((self->head == Py_None) && (pos != 0) && (pos != -1)) {
@@ -283,13 +285,13 @@ sll_insert(SllObject *self, PyObject *args) {
     if (pos == 0) {
         new_node = sllnode_create(self->head, value);
         self->head = new_node;
-    } else if (pos == self->length || pos == -1) {
+    } else if (pos == self->length-1 || pos == -1) {
         new_node = sllnode_create(Py_None, value);
         self->tail->next = new_node;
         self->tail = new_node;
     } else {
         current_node = self->head;
-        for(i=0; i < pos; i++) {
+        for(i=1; i < pos; i++) {
             current_node = current_node->next;
         }
         new_node = sllnode_create(current_node->next, value);
@@ -300,6 +302,58 @@ sll_insert(SllObject *self, PyObject *args) {
     Py_XDECREF(current_node);
     Py_XDECREF(value);
 
+    Py_RETURN_NONE;
+}
+
+static void
+sll_insert_node(SllObject *self, PyObject *args) {
+    SllNodeObject *current_node = NULL, *node=NULL;
+    PyObject *arg=NULL;
+    int pos = -1, i;
+
+    if (!PyArg_ParseTuple(args, "O|i", &arg, &pos))
+        return NULL;
+
+    node = (SllNodeObject *)arg;
+
+    if (pos != 0) {
+        if ((pos < 0 || pos >= self->length)) {
+            PyErr_SetString(PyExc_ValueError, "index out of range.");
+            return NULL;
+        }
+    }
+
+    if ((self->head == Py_None) && (pos != 0) && (pos != -1)) {
+        PyErr_SetString(PyExc_ValueError, "Empty List. can only be added to start");
+        return NULL;
+    }
+
+    if (self->head == Py_None) {
+        node->next=Py_None;
+        self->head = node;
+        self->tail = node;
+        self->length++;
+        Py_RETURN_NONE;
+    }
+
+    if (pos == 0) {
+        node->next=self->head->next;
+        self->head = node;
+    } else if (pos == self->length-1 || pos == -1) {
+        node->next=Py_None;
+        self->tail->next = node;
+        self->tail = node;
+    } else {
+        current_node = self->head;
+        for(i=1; i < pos; i++) {
+            current_node = current_node->next;
+        }
+        node->next=current_node->next;
+        current_node->next = node;
+    }
+    self->length++;
+
+    Py_XDECREF(current_node);
     Py_RETURN_NONE;
 }
 
@@ -338,6 +392,7 @@ sllObject_init(SllObject *self, PyObject *args, PyObject *kwds) {
 
 static PyMethodDef SllObjectMethods[] = {
     {"insert", (PyCFunction)sll_insert, METH_VARARGS, "Insert element to the list"},
+    {"insert_node", (PyCFunction)sll_insert_node, METH_VARARGS, "Insert node to the list"},
     { "delete", (PyCFunction)sll_delete, METH_VARARGS, "Delete element to the list"},
     {NULL},
 };
