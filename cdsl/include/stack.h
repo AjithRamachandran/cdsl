@@ -36,6 +36,10 @@ stack_pop(StackObject *self) {
     SlNodeObject *node = NULL;
     PyObject *value;
 
+    if (self->top == Py_None) {
+        return Py_None;
+    }
+
     value = self->top->value;
     node = self->top->next;
     slnode_delete(self->top, Py_None);
