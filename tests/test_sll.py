@@ -28,27 +28,12 @@ class TestSll(unittest.TestCase):
         print(new_sll)
         print(new_sll.node_at(5))
         print(new_sll.search(5), new_sll.search(15))
-        print(new_sll)
+        
+        new_sllnode = slnode(10)
+        new_sll.insert_node(new_sllnode)
+        print(new_sll, new_sll.tail, new_sll.tail.next)
 
         self.assertEqual(0, 0)
-
-# class TestSllNode(unittest.TestCase):
-#     def test_sll(self):
-#         new_sll = sll()
-#         new_sll.insert(1, 0)
-#         new_sll.insert(2, 0)
-#         new_sll.insert(3, 0)
-#         new_sll.insert(4, 0)
-#         new_sll.insert(5, 0)
-#         new_sll.insert(6, 0)
-#         print(new_sll, new_sll.length, new_sll.head, new_sll.tail)
-#         new_sllnode = slnode(10)
-#         print(new_sllnode, new_sllnode.value, new_sllnode.next )
-#         new_sll.insert_node(new_sllnode, 0)
-#         print(new_sllnode, new_sllnode.value, new_sllnode.next )
-#         print(new_sll, new_sll.length, new_sll.head, new_sll.tail)
-#         self.assertEqual(0, 0)
-
 
 
 if __name__ == '__main__':

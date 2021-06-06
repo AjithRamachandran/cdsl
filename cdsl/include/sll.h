@@ -19,87 +19,6 @@ typedef struct {
     int length;
 } SllObject;
 
-static PyObject *
-SllObject_Repr(SllObject *self) {
-    SlNodeObject *current_node = self->head;
-    PyObject *ret = NULL;
-
-    ret = PyUnicode_FromString("sll([");
-
-    if (Py_ReprEnter((PyObject *)self) > 0)
-        return PyUnicode_FromString("sll(<...>)");
-
-    if (current_node != Py_None) {
-        while (current_node != Py_None) {
-            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Repr(current_node->value)));
-            if (current_node != self->tail)
-                ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
-            current_node = current_node->next;
-        }
-    }
-    ret = PyUnicode_Concat(ret, PyUnicode_FromString("])"));
-
-    Py_XDECREF(current_node);
-    Py_ReprLeave((PyObject *)self);
-    return ret;
-}
-
-static PyObject *
-SllObject_Str(SllObject *self) {
-    SlNodeObject *current_node = self->head;
-    PyObject *ret = NULL;
-
-    ret = PyUnicode_FromString("sll([");
-
-    if (Py_ReprEnter((PyObject *)self) > 0)
-        return PyUnicode_FromString("sll(<...>)");
-
-    if (current_node != Py_None) {
-        while (current_node != Py_None) {
-            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Str(current_node->value)));
-            if (current_node != self->tail)
-                ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
-            current_node = current_node->next;
-        }
-    }
-    ret = PyUnicode_Concat(ret, PyUnicode_FromString("])"));
-
-    Py_XDECREF(current_node);
-    Py_ReprLeave((PyObject *)self);
-    return ret;
-}
-
-static int
-SllObject_Traverse(SllObject *self, visitproc visit, void *arg) {
-    SlNodeObject *node = self->head;
-
-    while (node != Py_None) {
-        SlNodeObject *next_node = node->next;
-        Py_VISIT(node);
-        node = next_node;
-    }
-
-    Py_XDECREF(node);
-    return 0;
-}
-
-static int
-SllObject_Clear(SllObject *self) {
-    SlNodeObject *node = self->head;
-
-    self->head = NULL;
-    self->tail = NULL;
-
-    while (node != Py_None) {
-        SlNodeObject *next_node = node->next;
-        node->next = Py_None;
-        Py_DECREF(node);
-        node = next_node;
-    }
-
-    return 0;
-}
-
 static SlNodeObject *
 sll_search(SllObject *self, PyObject *value) {
     SlNodeObject *current_node = self->head;
@@ -353,6 +272,87 @@ sll_insert_node(SllObject *self, PyObject *args) {
 
     Py_XDECREF(current_node);
     Py_RETURN_NONE;
+}
+
+static PyObject *
+SllObject_Repr(SllObject *self) {
+    SlNodeObject *current_node = self->head;
+    PyObject *ret = NULL;
+
+    ret = PyUnicode_FromString("sll([");
+
+    if (Py_ReprEnter((PyObject *)self) > 0)
+        return PyUnicode_FromString("sll(<...>)");
+
+    if (current_node != Py_None) {
+        while (current_node != Py_None) {
+            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Repr(current_node->value)));
+            if (current_node != self->tail)
+                ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
+            current_node = current_node->next;
+        }
+    }
+    ret = PyUnicode_Concat(ret, PyUnicode_FromString("])"));
+
+    Py_XDECREF(current_node);
+    Py_ReprLeave((PyObject *)self);
+    return ret;
+}
+
+static PyObject *
+SllObject_Str(SllObject *self) {
+    SlNodeObject *current_node = self->head;
+    PyObject *ret = NULL;
+
+    ret = PyUnicode_FromString("sll([");
+
+    if (Py_ReprEnter((PyObject *)self) > 0)
+        return PyUnicode_FromString("sll(<...>)");
+
+    if (current_node != Py_None) {
+        while (current_node != Py_None) {
+            ret = PyUnicode_Concat(ret, PyUnicode_FromFormat("%U", PyObject_Str(current_node->value)));
+            if (current_node != self->tail)
+                ret = PyUnicode_Concat(ret, PyUnicode_FromString(", "));
+            current_node = current_node->next;
+        }
+    }
+    ret = PyUnicode_Concat(ret, PyUnicode_FromString("])"));
+
+    Py_XDECREF(current_node);
+    Py_ReprLeave((PyObject *)self);
+    return ret;
+}
+
+static int
+SllObject_Traverse(SllObject *self, visitproc visit, void *arg) {
+    SlNodeObject *node = self->head;
+
+    while (node != Py_None) {
+        SlNodeObject *next_node = node->next;
+        Py_VISIT(node);
+        node = next_node;
+    }
+
+    Py_XDECREF(node);
+    return 0;
+}
+
+static int
+SllObject_Clear(SllObject *self) {
+    SlNodeObject *node = self->head;
+
+    self->head = NULL;
+    self->tail = NULL;
+
+    while (node != Py_None) {
+        SlNodeObject *next_node = node->next;
+        node->next = Py_None;
+        Py_DECREF(node);
+        node = next_node;
+    }
+
+    return 0;
 }
 
 static void
