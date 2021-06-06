@@ -23,7 +23,6 @@ PyMODINIT_FUNC
 PyInit_cdsl(void)
 {
     PyObject* cdsl;
-
     if(!slnode_init_type())
         return NULL;
 
@@ -52,6 +51,6 @@ PyInit_cdsl(void)
 
     if(!queue_reg_type(cdsl))
         return NULL;
-
+  
     return cdsl;
 }
