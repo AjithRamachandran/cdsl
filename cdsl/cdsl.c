@@ -4,6 +4,7 @@
 
 #include "include/slnode.h"
 #include "include/stack.h"
+#include "include/queue.h"
 #include "include/sll.h"
 
 static PyMethodDef cdsl_methods[] = {
@@ -31,6 +32,9 @@ PyInit_cdsl(void)
 
     if(!stack_init_type())
         return NULL;
+    
+    if(!queue_init_type())
+        return NULL;
 
     cdsl = PyModule_Create(&cdsl_moduledef);
 
@@ -44,6 +48,9 @@ PyInit_cdsl(void)
         return NULL;
 
     if(!stack_reg_type(cdsl))
+        return NULL;
+
+    if(!queue_reg_type(cdsl))
         return NULL;
 
     return cdsl;
