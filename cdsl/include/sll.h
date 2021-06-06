@@ -1,3 +1,6 @@
+#ifndef SLL_H
+#define SLL_H
+
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
@@ -11,7 +14,7 @@
 
 typedef struct {
     PyObject_HEAD
-        SlNodeObject *head;
+    SlNodeObject *head;
     SlNodeObject *tail;
     int length;
 } SllObject;
@@ -353,7 +356,7 @@ sll_insert_node(SllObject *self, PyObject *args) {
 }
 
 static void
-sllObject_dealloc(SllObject *self) {
+SllObject_dealloc(SllObject *self) {
     Py_XDECREF(self->head);
     Py_XDECREF(self->tail);
     Py_TYPE(self)->tp_free((PyObject *)self);
@@ -377,7 +380,7 @@ SllObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static int
-sllObject_init(SllObject *self, PyObject *args, PyObject *kwds) {
+SllObject_init(SllObject *self, PyObject *args, PyObject *kwds) {
     self->head = Py_None;
     self->tail = Py_None;
     self->length = 0;
@@ -405,12 +408,12 @@ static PyMemberDef SllObject_members[] = {
 
 static PyTypeObject SllType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "cdsl.sll",
+    .tp_name = "cdsl.sll",
     .tp_doc = "Sll object",
     .tp_basicsize = sizeof(SllObject),
     .tp_new = SllObject_new,
-    .tp_init = (initproc)sllObject_init,
-    .tp_dealloc = (destructor)sllObject_dealloc,
+    .tp_init = (initproc)SllObject_init,
+    .tp_dealloc = (destructor)SllObject_dealloc,
     .tp_repr = (reprfunc)SllObject_Repr,
     .tp_str = (reprfunc)SllObject_Str,
     .tp_traverse = (traverseproc)SllObject_Traverse,
@@ -438,3 +441,5 @@ int sll_reg_type(PyObject *module) {
     }
     return 1;
 }
+
+#endif // SLL_H

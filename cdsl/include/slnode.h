@@ -1,3 +1,6 @@
+#ifndef SLNODE_H
+#define SLNODE_H
+
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
@@ -11,7 +14,7 @@ static PyTypeObject SlNodeType;
 
 typedef struct {
     PyObject_HEAD
-        PyObject *value;
+    PyObject *value;
     struct SlNodeObject *next;
 } SlNodeObject;
 
@@ -76,7 +79,7 @@ SlNodeObject_Clear(SlNodeObject *self) {
 }
 
 static void
-slNodeObject_dealloc(SlNodeObject *self) {
+SlNodeObject_dealloc(SlNodeObject *self) {
     Py_XDECREF(self->value);
     Py_XDECREF(self->next);
     Py_TYPE(self)->tp_free((PyObject *)self);
@@ -101,7 +104,7 @@ SlNodeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static int
-slNodeObject_init(SlNodeObject *self, PyObject *args, PyObject *kwds) {
+SlNodeObject_init(SlNodeObject *self, PyObject *args, PyObject *kwds) {
     PyObject *value, *tmp;
 
     if (!PyArg_ParseTuple(args, "O", &value))
@@ -124,12 +127,12 @@ static PyMemberDef SlNodeObject_members[] = {
 
 static PyTypeObject SlNodeType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "cdsl.slnode",
+    .tp_name = "cdsl.slnode",
     .tp_doc = "SlNode object",
     .tp_basicsize = sizeof(SlNodeObject),
     .tp_new = SlNodeObject_new,
-    .tp_init = (initproc)slNodeObject_init,
-    .tp_dealloc = (destructor)slNodeObject_dealloc,
+    .tp_init = (initproc)SlNodeObject_init,
+    .tp_dealloc = (destructor)SlNodeObject_dealloc,
     .tp_repr = (reprfunc)SlNodeObject_Repr,
     .tp_str = (reprfunc)SlNodeObject_Str,
     .tp_traverse = (traverseproc)SlNodeObject_Traverse,
@@ -156,3 +159,5 @@ int slnode_reg_type(PyObject *module) {
     }
     return 1;
 }
+
+#endif // SLNODE_H

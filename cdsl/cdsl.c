@@ -1,10 +1,13 @@
+#define PY_SSIZE_T_CLEAN
+
 #include <Python.h>
 
-#include "include/sll.h"
+#include "include/slnode.h"
 #include "include/stack.h"
+#include "include/sll.h"
 
 static PyMethodDef cdsl_methods[] = {
-    { NULL }, /* sentinel */
+    { NULL },
 };
 
 static struct PyModuleDef cdsl_moduledef = {
@@ -26,8 +29,8 @@ PyInit_cdsl(void)
     if(!sll_init_type())
         return NULL;
 
-    // if(!stack_init_type())
-    //     return NULL;
+    if(!stack_init_type())
+        return NULL;
 
     cdsl = PyModule_Create(&cdsl_moduledef);
 
@@ -40,8 +43,8 @@ PyInit_cdsl(void)
     if(!sll_reg_type(cdsl))
         return NULL;
 
-    // if(!stack_reg_type(cdsl))
-    //     return NULL;
+    if(!stack_reg_type(cdsl))
+        return NULL;
 
     return cdsl;
 }
